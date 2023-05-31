@@ -7,43 +7,63 @@ namespace ScreenSaver
 {
     class Bubble
     {
-        private Point _center;
-        public int X { get => _center.X; private set => _center.X = value; }
-        public int Y { get => _center.Y; private set => _center.Y = value; }
 
-        private int _r;
+        public int X { get => Center.X; private set => Center.X = value; }
+        public int Y { get => Center.Y; private set => Center.Y = value; }
+        public int R { get; set; }
+        public int XSpeed { get; set; }
+        public int YSpeed { get; set; }
+        internal Point Center { get; private set; }
+
         private Color _color;
-        private int _xSpeed;
-        private int _ySpeed;
 
         public Bubble(int x, int y, Color color)
         {
-
-            X = x;
-            Y = y;
-            _r = 70;
+            Center = new Point(x,y);
+            R = 70;
             _color = color;
         }
         public Bubble(int x, int y, Color color, int xSpeed, int ySpeed) : this(x, y, color)
         {
-            _xSpeed = xSpeed;
-            _ySpeed = ySpeed;
+            XSpeed = xSpeed;
+            YSpeed = ySpeed;
         }
 
         public void Move()
         {
-            X += _xSpeed;
-            Y += _ySpeed;
+            X += XSpeed;
+            Y += YSpeed;
         }
 
-        public void Move(int windowH, int windowW, List<Bubble> bubbles)
-        { 
-
-        }
+        //public void Move(int windowH, int windowW, List<Bubble> bubbles)
+        //{
+        //    Move();
+        //    if (X - _r < 0 || X + _r > windowW)
+        //    {
+        //        _xSpeed = -_xSpeed;
+        //    }
+        //    if (Y - _r < 0 || Y + _r > windowH)
+        //    {
+        //        _ySpeed = -_ySpeed;
+        //    }
+        //    for (int i = 0; i < bubbles.Count; i++)
+        //    {
+        //        if (bubbles[i] != this)
+        //        {
+        //            if (Point.DistanceOf(_center, bubbles[i]._center) < _r + bubbles[i]._r)
+        //            {
+        //                _xSpeed = -_xSpeed;
+        //                _ySpeed = -_ySpeed;
+        //                bubbles[i]._xSpeed = -bubbles[i]._xSpeed;
+        //                bubbles[i]._ySpeed = -bubbles[i]._ySpeed;
+        //            }
+        //        }
+        //    }
+        //}
 
         public void Draw(Graphics g)
         {
-            g.FillEllipse(new SolidBrush(_color), X - _r, Y - _r, 2*_r, 2*_r);
+            g.FillEllipse(new SolidBrush(_color), X - R, Y - R, 2*R, 2*R);
         }
     }
 }

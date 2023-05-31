@@ -22,7 +22,7 @@ namespace ScreenSaver
         }
         public static double DistanceOf(Point point1, Point point2)
         {
-            double result = Math.Sqrt(Math.Pow(point1.X - point2.X, 2) + Math.Pow(point1.Y - point2.Y, 2));
+            double result = Math.Sqrt(Math.Pow(Math.Abs(point1.X - point2.X), 2) + Math.Pow(Math.Abs(point1.Y - point2.Y), 2));
             return result;
         }
     }

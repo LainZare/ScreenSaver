@@ -40,12 +40,15 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.ControlBox = false;
             this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "BubbleScreenSaver";
             this.Text = "Form1";
+            this.TopMost = true;
+            this.TransparencyKey = System.Drawing.SystemColors.Control;
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Load += new System.EventHandler(this.BubbleScreenSaver_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.BubbleScreenSaver_KeyDown);

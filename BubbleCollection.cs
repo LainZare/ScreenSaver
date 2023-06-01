@@ -29,20 +29,21 @@ namespace ScreenSaver
         {
             _width = width;
             _height = height;
-            // 泡泡的数量，num*2
+            // 控制泡泡的数量，实际数量为(num-1)*2，不宜过多
             int num = 5;
-            // 泡泡的速度
-            int speed = 5;
+            // 泡泡的速度，不宜过大
+            int speed = 10;
             Random random = new Random();
             // 生成泡泡
-            for (int i = 0; i < num; i++)
+            for (int i = 1; i < num; i++)
             {
-                bubbles.Add(new Bubble(i * width / num, 100,
+                bubbles.Add(new Bubble(i * width / num, height / 4,
                     Color.FromArgb(random.Next(0, 255), random.Next(0, 255), random.Next(0, 255)),
-                    random.Next(-speed, speed), random.Next(0, speed)));
-                bubbles.Add(new Bubble(i * width / num, height-100,
+                    random.Next(-speed, speed), random.Next(1, speed)));
+
+                bubbles.Add(new Bubble(i * width / num, 3 * height / 4,
                     Color.FromArgb(random.Next(0, 255), random.Next(0, 255), random.Next(0, 255)),
-                    random.Next(-speed, speed), random.Next(-speed, 0)));
+                    random.Next(-speed, speed), random.Next(-speed, 1)));
             }
         }
         /// <summary>
@@ -90,25 +91,16 @@ namespace ScreenSaver
                 {
                     if (Point.DistanceOf(bubbles[i].Center, bubbles[j].Center) <= bubbles[i].R + bubbles[j].R)
                     {
-                        #region 弃用
-                        //// 只靠虑两个泡泡间的碰撞
-                        //// 已重叠，回退
-                        //bubbles[i].X -= (bubbles[j].X - bubbles[i].X) * ((bubbles[i].R + bubbles[j].R) / Point.DistanceOf(bubbles[i].Center, bubbles[j].Center) - 1);
-                        //bubbles[i].Y -= (bubbles[j].Y - bubbles[i].Y) * ((bubbles[i].R + bubbles[j].R) / Point.DistanceOf(bubbles[i].Center, bubbles[j].Center) - 1);
-
-                        //// 使用简化的动量与能量计算
-                        //int sign = (bubbles[i].XSpeed - bubbles[j].XSpeed) > 0 ? 1 : -1;
-                        //int m = bubbles[i].XSpeed + bubbles[j].XSpeed;
-                        //int n = bubbles[i].XSpeed * bubbles[i].XSpeed + bubbles[j].XSpeed * bubbles[j].XSpeed;
-                        //bubbles[i].XSpeed = (int)(sign * Math.Sqrt(2 * n - m * m) + m) / 2;
-                        //bubbles[j].XSpeed = (int)(m - sign * Math.Sqrt(2 * n - m * m)) / 2;
-
-                        //sign = (bubbles[i].YSpeed - bubbles[j].YSpeed) > 0 ? 1 : -1;
-                        //m = bubbles[i].YSpeed + bubbles[j].YSpeed;
-                        //n = bubbles[i].YSpeed * bubbles[i].YSpeed + bubbles[j].YSpeed * bubbles[j].YSpeed;
-                        //bubbles[i].YSpeed = (int)(sign * Math.Sqrt(2 * n - m * m) + m) / 2;
-                        //bubbles[j].YSpeed = (int)(m - sign * Math.Sqrt(2 * n - m * m)) / 2;
-                        #endregion
+                        // 泡泡已重叠，需回退
+                        // 正常情况下不回退也可以
+                        // 不过极端情况下（比如速度大，电脑卡）的时候泡泡重叠部分过多，导致二者卡在一起
+                        do
+                        {
+                            bubbles[i].X -= bubbles[i].XSpeed;
+                            bubbles[i].Y -= bubbles[i].YSpeed;
+                            bubbles[j].X -= bubbles[j].XSpeed;
+                            bubbles[j].Y -= bubbles[j].YSpeed;
+                        } while (Point.DistanceOf(bubbles[i].Center, bubbles[j].Center) <= bubbles[i].R + bubbles[j].R);
 
                         // 简化的碰撞计算，二者交换速度
                         int tempSpeed;
@@ -118,6 +110,7 @@ namespace ScreenSaver
                         tempSpeed = bubbles[i].YSpeed;
                         bubbles[i].YSpeed = bubbles[j].YSpeed;
                         bubbles[j].YSpeed = tempSpeed;
+
                         // 只考虑两个泡泡的碰撞，避免鬼畜
                         break;
                     }

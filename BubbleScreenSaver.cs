@@ -17,14 +17,10 @@ namespace ScreenSaver
         public BubbleScreenSaver()
         {
             InitializeComponent();
-            this.SetStyle(ControlStyles.DoubleBuffer |
-              ControlStyles.UserPaint |
-              ControlStyles.AllPaintingInWmPaint,
-              true);
-            this.UpdateStyles();
         }
         private void BubbleScreenSaver_Load(object sender, EventArgs e)
         {
+            // 使用自定义的带双缓冲的Panel
             panel = new DoubleBufferedPanel();
             Controls.Add(panel);
         }
@@ -32,6 +28,7 @@ namespace ScreenSaver
 
         private void BubbleScreenSaver_KeyDown(object sender, KeyEventArgs e)
         {
+            // 按Esc键退出
             if (e.KeyCode == Keys.Escape)
             {
                 panel.DisposeUnit();

@@ -10,18 +10,21 @@ using System.Windows.Forms;
 namespace ScreenSaver
 {
     // Panel本身无法设置双缓冲，所以需要自定义一个Panel
+    /// <summary>
+    /// 带双缓冲的Panel
+    /// </summary>
     internal class DoubleBufferedPanel : Panel
     {
         BubbleCollection bubbles;
-
         Timer _timer;
 
         public DoubleBufferedPanel()
         {
+            // 设置双缓冲
             SetStyle(ControlStyles.DoubleBuffer |
-                             ControlStyles.UserPaint |
-                                          ControlStyles.AllPaintingInWmPaint,
-                                                       true);
+                        ControlStyles.UserPaint |
+            ControlStyles.AllPaintingInWmPaint,
+                                            true);
             UpdateStyles();
 
             Dock = DockStyle.Fill;
@@ -38,7 +41,7 @@ namespace ScreenSaver
         private void Timer_Tick(object sender, EventArgs e)
         {
             bubbles.Move();
-
+            // 关键代码，重绘，触发OnPaint事件
             Invalidate();
         }
 
@@ -49,7 +52,9 @@ namespace ScreenSaver
 
             bubbles.Draw(g);
         }
-
+        /// <summary>
+        /// 释放资源
+        /// </summary>
         public void DisposeUnit()
         {
             _timer.Dispose();

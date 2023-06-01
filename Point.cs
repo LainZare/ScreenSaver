@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace ScreenSaver
 {
+    /// <summary>
+    /// 自定义点类
+    /// </summary>
     internal class Point
     {
         public int X { get; set; }
@@ -20,6 +23,12 @@ namespace ScreenSaver
             X = x;
             Y = y;
         }
+        /// <summary>
+        /// 计算两点之间的距离
+        /// </summary>
+        /// <param name="point1"></param>
+        /// <param name="point2"></param>
+        /// <returns></returns>
         public static int DistanceOf(Point point1, Point point2)
         {
             int result = (int)Math.Sqrt(Math.Pow(point1.X - point2.X, 2) + Math.Pow(point1.Y - point2.Y, 2));

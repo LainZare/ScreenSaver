@@ -37,7 +37,6 @@
             this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.ControlBox = false;
-            this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "BubbleScreenSaver";
             this.Text = "Form1";

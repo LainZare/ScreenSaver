@@ -32,7 +32,7 @@ namespace ScreenSaver
             // 控制泡泡的数量，实际数量为(num-1)*2，不宜过多
             int num = 5;
             // 泡泡的速度，不宜过大
-            int speed = 10;
+            int speed = 5;
             Random random = new Random();
             // 生成泡泡
             for (int i = 1; i < num; i++)
@@ -116,9 +116,12 @@ namespace ScreenSaver
                     }
                 }
                 #endregion
+            }
 
-                // 碰撞处理完成，移动
-                bubbles[i].Move();
+            // 碰撞处理完成，移动
+            foreach (Bubble bubble in bubbles)
+            {
+                bubble.Move();
             }
         }
         

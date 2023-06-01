@@ -9,9 +9,9 @@ using System.Windows.Forms;
 
 namespace ScreenSaver
 {
-    // Panel本身无法设置双缓冲，所以需要自定义一个Panel
+    // Panel本身无法设置双缓存，所以需要自定义一个Panel
     /// <summary>
-    /// 带双缓冲的Panel
+    /// 带双缓存的Panel
     /// </summary>
     internal class DoubleBufferedPanel : Panel
     {
@@ -20,7 +20,7 @@ namespace ScreenSaver
 
         public DoubleBufferedPanel()
         {
-            // 设置双缓冲
+            // 设置双缓存
             SetStyle(ControlStyles.DoubleBuffer |
                         ControlStyles.UserPaint |
             ControlStyles.AllPaintingInWmPaint,
@@ -28,7 +28,6 @@ namespace ScreenSaver
             UpdateStyles();
 
             Dock = DockStyle.Fill;
-            BackColor = Color.Transparent;
 
             bubbles = new BubbleCollection(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
 

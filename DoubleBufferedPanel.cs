@@ -14,7 +14,6 @@ namespace ScreenSaver
     {
         BubbleCollection bubbles;
 
-        //Graphics _graphics;
         Timer _timer;
 
         public DoubleBufferedPanel()
@@ -28,21 +27,17 @@ namespace ScreenSaver
             Dock = DockStyle.Fill;
             BackColor = Color.Transparent;
 
-            //_graphics = CreateGraphics();
-            //_graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-
-            bubbles = new BubbleCollection(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height, 5);
-
+            bubbles = new BubbleCollection(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
 
             _timer = new Timer();
-            _timer.Interval = 50;
+            _timer.Interval = 30;
             _timer.Tick += Timer_Tick;
             _timer.Start();
 
         }
         private void Timer_Tick(object sender, EventArgs e)
         {
-            bubbles.Move(Height, Width);
+            bubbles.Move();
 
             Invalidate();
         }
@@ -58,7 +53,6 @@ namespace ScreenSaver
         public void DisposeUnit()
         {
             _timer.Dispose();
-            //_graphics.Dispose();
         }
     }
 }

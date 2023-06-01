@@ -1,20 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.SymbolStore;
 using System.Drawing;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace ScreenSaver
 {
     internal class BubbleCollection
     {
         List<Bubble> bubbles = new List<Bubble>();
+        int _width;
+        int _height;
 
-        public BubbleCollection(int width, int height, int num)
+        public BubbleCollection(int width, int height)
         {
-            int speed = 7;
+            int num = 5;
+            int speed = 5;
+            _width = width;
+            _height = height;
             Random random = new Random();
             for (int i = 1; i < num; i++)
             {
@@ -27,34 +34,78 @@ namespace ScreenSaver
             }
         }
 
-        public void Move(int windowH, int windowW)
+        public void Move()
         {
-            foreach (Bubble bubble in bubbles)
+            // 泡泡四个边界的坐标
+            int up, down, left, right;
+            int i, j;
+            for (i = 0; i < bubbles.Count; i++)
             {
-                bubble.Move();
-                if (bubble.X - bubble.R < 0 || bubble.X + bubble.R > windowW)
+                up = bubbles[i].Y - bubbles[i].R;
+                down = bubbles[i].Y + bubbles[i].R;
+                left = bubbles[i].X - bubbles[i].R;
+                right = bubbles[i].X + bubbles[i].R;
+
+                if (left <= 0)
                 {
-                    bubble.XSpeed = -bubble.XSpeed;
+                    // 已经发生交错，先回退，防止鬼畜
+                    bubbles[i].X -= left;
+                    bubbles[i].XSpeed = -bubbles[i].XSpeed;
                 }
-                if (bubble.Y - bubble.R < 0 || bubble.Y + bubble.R > windowH)
+                if (right >= _width)
                 {
-                    bubble.YSpeed = -bubble.YSpeed;
+                    bubbles[i].X -= right - _width;
+                    bubbles[i].XSpeed = -bubbles[i].XSpeed;
                 }
-            }
-            for (int i = 0; i < bubbles.Count; i++)
-            {
-                for (int j = i + 1; j < bubbles.Count; j++)
+
+                if (up <= 0)
                 {
-                    if (Point.DistanceOf(bubbles[i].Center, bubbles[j].Center) < bubbles[i].R + bubbles[j].R)
+                    bubbles[i].Y -= up;
+                    bubbles[i].YSpeed = -bubbles[i].YSpeed;
+                }
+                if (down >= _height)
+                {
+                    bubbles[i].Y -= down - _height;
+                    bubbles[i].YSpeed = -bubbles[i].YSpeed;
+                }
+
+                for (j = i + 1; j < bubbles.Count; j++)
+                {
+                    if (Point.DistanceOf(bubbles[i].Center, bubbles[j].Center) <= bubbles[i].R + bubbles[j].R)
                     {
-                        bubbles[i].XSpeed = -bubbles[i].XSpeed;
-                        bubbles[i].YSpeed = -bubbles[i].YSpeed;
-                        bubbles[j].XSpeed = -bubbles[j].XSpeed;
-                        bubbles[j].YSpeed = -bubbles[j].YSpeed;
+                        #region 弃用
+                        //// 只靠虑两个泡泡间的碰撞
+                        //// 已重叠，回退
+                        //bubbles[i].X -= (bubbles[j].X - bubbles[i].X) * ((bubbles[i].R + bubbles[j].R) / Point.DistanceOf(bubbles[i].Center, bubbles[j].Center) - 1);
+                        //bubbles[i].Y -= (bubbles[j].Y - bubbles[i].Y) * ((bubbles[i].R + bubbles[j].R) / Point.DistanceOf(bubbles[i].Center, bubbles[j].Center) - 1);
+
+                        //// 使用简化的动量与能量计算
+                        //int sign = (bubbles[i].XSpeed - bubbles[j].XSpeed) > 0 ? 1 : -1;
+                        //int m = bubbles[i].XSpeed + bubbles[j].XSpeed;
+                        //int n = bubbles[i].XSpeed * bubbles[i].XSpeed + bubbles[j].XSpeed * bubbles[j].XSpeed;
+                        //bubbles[i].XSpeed = (int)(sign * Math.Sqrt(2 * n - m * m) + m) / 2;
+                        //bubbles[j].XSpeed = (int)(m - sign * Math.Sqrt(2 * n - m * m)) / 2;
+
+                        //sign = (bubbles[i].YSpeed - bubbles[j].YSpeed) > 0 ? 1 : -1;
+                        //m = bubbles[i].YSpeed + bubbles[j].YSpeed;
+                        //n = bubbles[i].YSpeed * bubbles[i].YSpeed + bubbles[j].YSpeed * bubbles[j].YSpeed;
+                        //bubbles[i].YSpeed = (int)(sign * Math.Sqrt(2 * n - m * m) + m) / 2;
+                        //bubbles[j].YSpeed = (int)(m - sign * Math.Sqrt(2 * n - m * m)) / 2;
+                        #endregion
+
+                        int tempSpeed;
+                        tempSpeed = bubbles[i].XSpeed;
+                        bubbles[i].XSpeed = bubbles[j].XSpeed;
+                        bubbles[j].XSpeed = tempSpeed;
+                        tempSpeed = bubbles[i].YSpeed;
+                        bubbles[i].YSpeed = bubbles[j].YSpeed;
+                        bubbles[j].YSpeed = tempSpeed;
+
+                        break;
                     }
                 }
+                bubbles[i].Move();
             }
-
         }
         public void Draw(Graphics g)
         {

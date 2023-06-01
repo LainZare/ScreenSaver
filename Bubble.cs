@@ -8,15 +8,14 @@ namespace ScreenSaver
     class Bubble
     {
 
-        public int X { get => Center.X; private set => Center.X = value; }
-        public int Y { get => Center.Y; private set => Center.Y = value; }
+        internal Point Center { get; private set; }
+        public int X { get => Center.X;  set => Center.X = value; }
+        public int Y { get => Center.Y;  set => Center.Y = value; }
         public int R { get; set; }
         public int XSpeed { get; set; }
         public int YSpeed { get; set; }
-        internal Point Center { get; private set; }
 
         private Color _color;
-
         public Bubble(int x, int y, Color color)
         {
             Center = new Point(x,y);
@@ -34,7 +33,6 @@ namespace ScreenSaver
             X += XSpeed;
             Y += YSpeed;
         }
-
         //public void Move(int windowH, int windowW, List<Bubble> bubbles)
         //{
         //    Move();

@@ -25,7 +25,6 @@ namespace ScreenSaver
             Controls.Add(panel);
         }
 
-
         private void BubbleScreenSaver_KeyDown(object sender, KeyEventArgs e)
         {
             // 按Esc键退出

@@ -13,7 +13,7 @@ namespace ScreenSaver
 {
     public partial class BubbleScreenSaver : Form
     {
-        DoubleBufferedPanel panel;
+        BubblesPanel panel;
         public BubbleScreenSaver()
         {
             InitializeComponent();
@@ -21,7 +21,7 @@ namespace ScreenSaver
         private void BubbleScreenSaver_Load(object sender, EventArgs e)
         {
             // 使用自定义的带双缓冲的Panel
-            panel = new DoubleBufferedPanel();
+            panel = new BubblesPanel();
             Controls.Add(panel);
         }
 
@@ -31,7 +31,6 @@ namespace ScreenSaver
             // 按Esc键退出
             if (e.KeyCode == Keys.Escape)
             {
-                panel.DisposeUnit();
                 Close();
             }
         }

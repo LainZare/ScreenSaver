@@ -30,8 +30,8 @@ namespace ScreenSaver
         static int _maxSpeed;
         // 颜色
         static int[][] _colors;
-        // 泡泡是否全部放出
-        static bool _isAllReleased;
+        // 已经放出的泡泡数量
+        int _releasedCount = 1;
 
         public BubblesPanel()
         {
@@ -48,9 +48,9 @@ namespace ScreenSaver
             _height = Screen.PrimaryScreen.Bounds.Height;
 
 
-            InitBubbles(10);
+            InitBubbles(100);
 
-            Thread bubbleMove = new Thread(Move);
+            Thread bubbleMove = new Thread(BubblesMove);
             bubbleMove.IsBackground = true;
             bubbleMove.Start();
 
@@ -63,15 +63,14 @@ namespace ScreenSaver
             _speeds = new int[num][];
             _colors = new int[num][];
 
-            _isAllReleased = false;
-            _maxSpeed = 5;
+            _maxSpeed = 7;
             _radius = 70;
 
             Random rnd = new Random();
             for (int i = 0; i < num; i++)
             {
                 // (x,y), 初始都是(0,0)
-                _points[i] = new int[] { 0, 0 };
+                _points[i] = new int[] { 71, 71 };
                 // X,Y轴速度
                 _speeds[i] = new int[] { rnd.Next(2, _maxSpeed), rnd.Next(2, _maxSpeed) };
                 // R,G,B
@@ -80,45 +79,34 @@ namespace ScreenSaver
         }
 
         // 后台线程操作
-        void Move()
+        void BubblesMove()
         {
-            int i = 0;
-
-            #region 先把泡泡一个一个放出
-            while (!_isAllReleased)
-            {
-                while (DistanceOf(_points[i][0], _points[i][1], 0, 0) < _radius)
-                {
-                    _points[i][0] += _speeds[i][0];
-                    _points[i][1] += _speeds[i][1];
-                    Invalidate();
-                }
-                i++;
-                if (i == _points.Length)
-                    _isAllReleased = true;
-            }
-            #endregion
+            int breakCount = 0;
+            int i, j;
+            // 准备好释放新泡泡
+            bool isReadyToReleaseNewBubble;
 
             // 泡泡四个边界所处的位置
             int up, down, left, right;
-
-            int j;
+            int distance2;
 
             while (true)
             {
-                for (i = 0; i < _points.Length; i++)
+                Thread.Sleep(30);
+                for (i = 0; i < _releasedCount; i++)
                 {
                     #region 与边界的碰撞处理
-                    up = _points[i][1] - _radius;
-                    down = _points[i][1] + _radius;
                     left = _points[i][0] - _radius;
                     right = _points[i][0] + _radius;
+
+                    up = _points[i][1] - _radius;
+                    down = _points[i][1] + _radius;
 
                     if (left <= 0)
                     {
                         // 已经发生交错，先回退至屏幕内，防止鬼畜，下同
                         _points[i][0] -= left;
-                        _speeds[i][0] = _speeds[i][0];
+                        _speeds[i][0] = -_speeds[i][0];
                     }
                     if (right >= _width)
                     {
@@ -139,9 +127,12 @@ namespace ScreenSaver
                     #endregion
 
                     #region 与其他泡泡的碰撞处理
-                    for (j = i + 1; j < _points.Length; j++)
+                    for (j = i + 1; j < _releasedCount; j++)
                     {
-                        if (DistanceOf(_points[i][0], _points[i][1], _points[j][0], _points[j][1]) <= 2 * _radius)
+                        distance2 = (_points[i][0] - _points[j][0]) * (_points[i][0] - _points[j][0])
+                                   + (_points[i][1] - _points[j][1]) * (_points[i][1] - _points[j][1]);
+
+                        if (distance2 <= 4 * _radius * _radius)
                         {
                             // 泡泡已重叠，需回退
                             // 正常情况下不回退也可以
@@ -151,28 +142,59 @@ namespace ScreenSaver
                                 _points[i][0] -= _speeds[i][0];
                                 _points[i][1] -= _speeds[i][1];
                                 _points[j][0] -= _speeds[j][0];
-                                _points[j][1] -= _speeds[i][1];
-                            } while (DistanceOf(_points[i][0], _points[i][1], _points[j][0], _points[j][1]) <= 2 * _radius);
+                                _points[j][1] -= _speeds[j][1];
+                                distance2 = (_points[i][0] - _points[j][0]) * (_points[i][0] - _points[j][0]) 
+                                           + (_points[i][1] - _points[j][1]) * (_points[i][1] - _points[j][1]);
+                                //Invalidate();
+                                //Thread.Sleep(30);
+                                breakCount++;
+                                if (breakCount > 50)
+                                {
+                                    breakCount = 0;
+                                    break;
+                                }
+                            } while (distance2 < 4 * _radius * _radius);
 
                             // 简化的碰撞计算，二者交换速度
                             int tempSpeed;
-                            tempSpeed = bubbles[i].XSpeed;
-                            bubbles[i].XSpeed = bubbles[j].XSpeed;
-                            bubbles[j].XSpeed = tempSpeed;
-                            tempSpeed = bubbles[i].YSpeed;
-                            bubbles[i].YSpeed = bubbles[j].YSpeed;
-                            bubbles[j].YSpeed = tempSpeed;
+                            tempSpeed = _speeds[i][0];
+                            _speeds[i][0] = _speeds[j][0];
+                            _speeds[j][0] = tempSpeed;
+                            tempSpeed = _speeds[i][1];
+                            _speeds[i][1] = _speeds[j][1];
+                            _speeds[j][1] = tempSpeed;
 
                             // 只考虑两个泡泡的碰撞，避免鬼畜
                             break;
                         }
                     }
                     #endregion
-
                 }
 
 
                 // 泡泡自然移动
+                for (i = 0; i < _releasedCount; i++)
+                {
+                    _points[i][0] += _speeds[i][0];
+                    _points[i][1] += _speeds[i][1];
+                }
+
+                // 控制泡泡一个一个放出
+                if (_releasedCount < _points.Length)
+                {
+                    isReadyToReleaseNewBubble = true;
+                    for (i = 0; i < _releasedCount; i++)
+                    {
+                        if (_points[i][0] < 3 * _radius && _points[i][1] < 3 * _radius)
+                        {
+                            isReadyToReleaseNewBubble = false;
+                        }
+                    }
+                    if (isReadyToReleaseNewBubble)
+                    {
+                        _releasedCount++;
+                    }
+                }
 
                 // 关键代码，重绘，触发OnPaint事件
                 Invalidate();
@@ -180,11 +202,11 @@ namespace ScreenSaver
         }
 
         // 计算两点间的距离
-        int DistanceOf(int ax, int ay, int bx, int by)
-        {
-            int result = (int)Math.Sqrt(Math.Pow(ax - bx, 2) + Math.Pow(ay - by, 2));
-            return result;
-        }
+        //int DistanceOf(int ax, int ay, int bx, int by)
+        //{
+        //    int result = (int)Math.Sqrt(Math.Pow(ax - bx, 2) + Math.Pow(ay - by, 2));
+        //    return result;
+        //}
 
         protected override void OnPaint(PaintEventArgs e)
         {
@@ -192,6 +214,10 @@ namespace ScreenSaver
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
             // 绘图
+            for (int i = 0; i < _releasedCount; i++)
+            {
+                g.FillEllipse(new SolidBrush(Color.FromArgb(_colors[i][0], _colors[i][1], _colors[i][2])), _points[i][0] - _radius, _points[i][1] - _radius, 2 * _radius, 2 * _radius);
+            }
         }
     }
 }

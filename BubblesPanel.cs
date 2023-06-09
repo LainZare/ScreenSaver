@@ -17,8 +17,8 @@ namespace ScreenSaver
     /// </summary>
     internal class BubblesPanel : Panel
     {
-        int _width;
-        int _height;
+        static int _width;
+        static int _height;
 
         // 圆心坐标
         static int[][] _points;
@@ -31,7 +31,7 @@ namespace ScreenSaver
         // 颜色
         static int[][] _colors;
         // 已经放出的泡泡数量
-        int _releasedCount = 1;
+        static int _releasedCount = 1;
 
         public BubblesPanel()
         {
@@ -63,13 +63,13 @@ namespace ScreenSaver
             _speeds = new int[num][];
             _colors = new int[num][];
 
-            _maxSpeed = 7;
+            _maxSpeed = 5;
             _radius = 70;
 
             Random rnd = new Random();
             for (int i = 0; i < num; i++)
             {
-                // (x,y), 初始都是(0,0)
+                // (x,y), 初始都是(71, 71)
                 _points[i] = new int[] { 71, 71 };
                 // X,Y轴速度
                 _speeds[i] = new int[] { rnd.Next(2, _maxSpeed), rnd.Next(2, _maxSpeed) };
@@ -92,7 +92,8 @@ namespace ScreenSaver
 
             while (true)
             {
-                Thread.Sleep(30);
+                // 控制刷新速度
+                Thread.Sleep(20);
                 for (i = 0; i < _releasedCount; i++)
                 {
                     #region 与边界的碰撞处理
@@ -134,21 +135,34 @@ namespace ScreenSaver
 
                         if (distance2 <= 4 * _radius * _radius)
                         {
-                            // 泡泡已重叠，需回退
-                            // 正常情况下不回退也可以
-                            // 不过极端情况下（比如速度大，电脑卡）的时候泡泡重叠部分过多，导致二者卡在一起
+                            // 泡泡已重叠，需互相远离
                             do
                             {
-                                _points[i][0] -= _speeds[i][0];
-                                _points[i][1] -= _speeds[i][1];
-                                _points[j][0] -= _speeds[j][0];
-                                _points[j][1] -= _speeds[j][1];
+                                if (_points[i][0] > _points[j][0])
+                                {
+                                    _points[i][0]++;
+                                    _points[j][0]--;
+                                }
+                                else
+                                {
+                                    _points[i][0]--;
+                                    _points[j][0]++;
+                                }
+                                if (_points[i][1] > _points[j][1])
+                                {
+                                    _points[i][1]++;
+                                    _points[j][1]--;
+                                }
+                                else
+                                {
+                                    _points[i][1]--;
+                                    _points[j][1]++;
+                                }
                                 distance2 = (_points[i][0] - _points[j][0]) * (_points[i][0] - _points[j][0]) 
                                            + (_points[i][1] - _points[j][1]) * (_points[i][1] - _points[j][1]);
-                                //Invalidate();
-                                //Thread.Sleep(30);
+
                                 breakCount++;
-                                if (breakCount > 50)
+                                if (breakCount > 70)
                                 {
                                     breakCount = 0;
                                     break;
@@ -200,13 +214,6 @@ namespace ScreenSaver
                 Invalidate();
             }
         }
-
-        // 计算两点间的距离
-        //int DistanceOf(int ax, int ay, int bx, int by)
-        //{
-        //    int result = (int)Math.Sqrt(Math.Pow(ax - bx, 2) + Math.Pow(ay - by, 2));
-        //    return result;
-        //}
 
         protected override void OnPaint(PaintEventArgs e)
         {

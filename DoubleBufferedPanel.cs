@@ -29,10 +29,10 @@ namespace ScreenSaver
 
             Dock = DockStyle.Fill;
 
-            bubbles = new BubbleCollection(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
+            bubbles = new BubbleCollection(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height, 100);
 
             _timer = new Timer();
-            _timer.Interval = 30;
+            _timer.Interval = 20;
             _timer.Tick += Timer_Tick;
             _timer.Start();
 

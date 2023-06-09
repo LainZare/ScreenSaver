@@ -19,41 +19,53 @@ namespace ScreenSaver
         // 屏幕的宽度和高度
         int _width;
         int _height;
+        // 控制泡泡的数量
+        int _num;
+        // 有空余位置
+        bool _isReadyToReleaseNewBubble;
+        int _maxSpeed;
 
         /// <summary>
         /// 泡泡集合的构造函数
         /// </summary>
         /// <param name="width">屏幕宽度</param>
         /// <param name="height">屏幕高度</param>
-        public BubbleCollection(int width, int height)
+        public BubbleCollection(int width, int height, int num)
         {
             _width = width;
             _height = height;
-            // 控制泡泡的数量，实际数量为(num-1)*2，不宜过多
-            int num = 5;
-            // 泡泡的速度，不宜过大
-            int speed = 5;
-            Random random = new Random();
-            // 生成泡泡
-            for (int i = 1; i < num; i++)
-            {
-                bubbles.Add(new Bubble(i * width / num, height / 4,
-                    Color.FromArgb(random.Next(0, 255), random.Next(0, 255), random.Next(0, 255)),
-                    random.Next(-speed, speed), random.Next(1, speed)));
+            _num = num;
 
-                bubbles.Add(new Bubble(i * width / num, 3 * height / 4,
-                    Color.FromArgb(random.Next(0, 255), random.Next(0, 255), random.Next(0, 255)),
-                    random.Next(-speed, speed), random.Next(-speed, 1)));
-            }
+            _maxSpeed = 5;
         }
         /// <summary>
         /// 控制所有泡泡移动
         /// </summary>
         public void Move()
         {
+            int i, j;
+            // 控制泡泡一个一个放出
+            if (bubbles.Count < _num)
+            {
+                _isReadyToReleaseNewBubble = true;
+                for (i = 0; i < bubbles.Count; i++)
+                {
+                    if (bubbles[i].X < 3 * bubbles[i].R && bubbles[i].Y < 3 * bubbles[i].R)
+                    {
+                        _isReadyToReleaseNewBubble = false;
+                    }
+                }
+                if (_isReadyToReleaseNewBubble)
+                {
+                    Random random = new Random();
+                    bubbles.Add(new Bubble(71, 71, Color.FromArgb(random.Next(0, 255), random.Next(0, 255), random.Next(0, 255)),
+                        random.Next(2, _maxSpeed), random.Next(2, _maxSpeed)));
+                }
+            }
+
+
             // 泡泡四个边界所处的位置
             int up, down, left, right;
-            int i, j;
             for (i = 0; i < bubbles.Count; i++)
             {
                 #region 与边界的碰撞处理
@@ -91,15 +103,33 @@ namespace ScreenSaver
                 {
                     if (Point.DistanceOf(bubbles[i].Center, bubbles[j].Center) <= bubbles[i].R + bubbles[j].R)
                     {
-                        // 泡泡已重叠，需回退
-                        // 正常情况下不回退也可以
-                        // 不过极端情况下（比如速度大，电脑卡）的时候泡泡重叠部分过多，导致二者卡在一起
+                        // 泡泡已重叠，需互相远离
                         do
                         {
                             bubbles[i].X -= bubbles[i].XSpeed;
                             bubbles[i].Y -= bubbles[i].YSpeed;
                             bubbles[j].X -= bubbles[j].XSpeed;
                             bubbles[j].Y -= bubbles[j].YSpeed;
+                            if (bubbles[i].X > bubbles[j].X)
+                            {
+                                bubbles[i].X++;
+                                bubbles[j].X--;
+                            }
+                            else
+                            {
+                                bubbles[i].X--;
+                                bubbles[j].X++;
+                            }
+                            if (bubbles[i].Y > bubbles[j].Y)
+                            {
+                                bubbles[i].Y++;
+                                bubbles[j].Y--;
+                            }
+                            else
+                            {
+                                bubbles[i].Y--;
+                                bubbles[j].Y++;
+                            }
                         } while (Point.DistanceOf(bubbles[i].Center, bubbles[j].Center) <= bubbles[i].R + bubbles[j].R);
 
                         // 简化的碰撞计算，二者交换速度
@@ -124,7 +154,7 @@ namespace ScreenSaver
                 bubble.Move();
             }
         }
-        
+
         /// <summary>
         /// 为所有泡泡绘图
         /// </summary>
@@ -133,7 +163,7 @@ namespace ScreenSaver
         {
             foreach (var bubble in bubbles)
             {
-                bubble.Draw(g);
+                g.FillEllipse(new SolidBrush(bubble.Color), bubble.X - bubble.R, bubble.Y - bubble.R, 2 * bubble.R, 2 * bubble.R);
             }
         }
     }

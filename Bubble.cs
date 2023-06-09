@@ -13,11 +13,10 @@ namespace ScreenSaver
         internal Point Center { get; private set; }
         public int X { get => Center.X;  set => Center.X = value; }
         public int Y { get => Center.Y;  set => Center.Y = value; }
-        public int R { get; set; }
+        public int R { get; private set; }
         public int XSpeed { get; set; }
         public int YSpeed { get; set; }
-
-        private Color _color;
+        public Color Color { get ; private set ; }
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -28,7 +27,7 @@ namespace ScreenSaver
         {
             Center = new Point(x,y);
             R = 70;
-            _color = color;
+            Color = color;
         }
         /// <summary>
         /// 构造函数
@@ -50,14 +49,6 @@ namespace ScreenSaver
         {
             X += XSpeed;
             Y += YSpeed;
-        }
-        /// <summary>
-        /// 绘图
-        /// </summary>
-        /// <param name="g"></param>
-        public void Draw(Graphics g)
-        {
-            g.FillEllipse(new SolidBrush(_color), X - R, Y - R, 2*R, 2*R);
         }
     }
 }

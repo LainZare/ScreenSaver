@@ -1,15 +1,15 @@
-# C# ÅÝÅÝÆÁ±£
+# C# æ³¡æ³¡å±ä¿
 
-## ¹Ø¼üµã
+## å…³é”®ç‚¹
 
-### Ë«»º´æ
+### åŒç¼“å­˜
 
-Panel±¾ÉíÎÞ·¨ÉèÖÃË«»º´æ£¬ÐèÒª×Ô½¨Ò»¸öÀà¼Ì³ÐPanel£¬ÉèÖÃË«»º´æ¡£
+Panelæœ¬èº«æ— æ³•è®¾ç½®åŒç¼“å­˜ï¼Œéœ€è¦è‡ªå»ºä¸€ä¸ªç±»ç»§æ‰¿Panelï¼Œè®¾ç½®åŒç¼“å­˜ã€‚
 
-ÓÃ `Invalidate()` Ç¿ÖÆÖØ»æ£¬´¥·¢ `OnPaint()` ÊÂ¼þ¡£
+ç”¨ `Invalidate()` å¼ºåˆ¶é‡ç»˜ï¼Œè§¦å‘ `OnPaint()` äº‹ä»¶ã€‚
 
-### Í¸Ã÷´°Ìå
+### é€æ˜Žçª—ä½“
 
-ÔÚÖ÷´°ÌåÉÏÌí¼ÓÒ»¸öPanel£¬ÔÚPanelÉÏ»æÖÆÅÝÅÝ¡£
+åœ¨ä¸»çª—ä½“ä¸Šæ·»åŠ ä¸€ä¸ªPanelï¼Œåœ¨Panelä¸Šç»˜åˆ¶æ³¡æ³¡ã€‚
 
-µ×²ã´°ÌåÉèÖÃ `TransparencyKey` Îª PanelµÄ `BackColor`£¬²¢ÉèÖÃ `FormBorderStyle` Îª `None`£¬¼´¿ÉÊµÏÖÍ¸Ã÷´°Ìå¡£
+åº•å±‚çª—ä½“è®¾ç½® `TransparencyKey` ä¸º Panelçš„ `BackColor`ï¼Œå¹¶è®¾ç½® `FormBorderStyle` ä¸º `None`ï¼Œå³å¯å®žçŽ°é€æ˜Žçª—ä½“ã€‚
